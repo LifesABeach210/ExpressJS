@@ -1,45 +1,91 @@
 var express = require('express');
 var router = express.Router();
-
 var blogs = require("../public/javascripts/sampleBlogs");
 const blogPosts = blogs.blogPosts;
+const { blogsDB } = require('../mongo')
 
 
-router.get('/', function(req, res, next) {
-    res.json(blogPosts);
+
+
+router.get('/', async function(req, res, next) {
+
+  const collection = await blogsDB().collection("post");
+    const post = await collection.find({}).toArray();
+        res.json(post);
+
+    // res.json(blogPosts);
+});
+
+router.get('/authors', async function (req, res, next) {
+var collection1 = await blogsDB().collection("post");
+var author = await collection1.distinct('author');
+let post = await collection1.find({}).toArray();
+res.json({author:author,post:post});
+
+
+
 });
 
 
-router.get('/all', function(req, res){
-    let sort = req.query.sort;
+router.get('/sort', async function(req, res) {
+        var collection1 = await blogsDB().collection("post");
 
-    res.json(sortBlogs(sort));
+
+
+
+        var getPosts = (sortField, sortOrder, filterField, filterValue) => {
+
+          var sort = {};
+
+          sortField && sortOrder ? sort[sortField] = sortOrder : sort
+
+          var filter = {};
+
+          filterField && filterValue ? filter[filterField] = filterValue : filter;
+
+          var dbResult = collection1.find(filter).sort(sort).toArray();
+
+          return dbResult;
+        };
+        var post = await getPosts('title', -1, 'id');
+    // let sort = req.query.sort;
+      res.json(post);
+    // res.json(sortBlogs(sort));
 
 });
 
+router.get('/singleBlog/:blogId', async function(req, res) {
+        var collection2 = await blogsDB().collection('post');
 
-router.get('/singleBlog/:blogId', function (req, res) {
-    const blogId = req.params.blogId;
+        var postFind = (blogId) => {
+            var blogById = blogId ? {id: blogId} : {};
+            var dbresults = collection2.find(blogById).toArray();
+            return dbresults;
+};
 
-    res.json(findBlogId(blogId))
+var post = await postFind('9');
+    // const blogId = req.params.blogId;
+    //
+    // res.json(findBlogId(blogId))
+    res.json(post);
+});
 
-})
+router.get('/postBlog',  function (req, res, next) {
+  //var collection2 = await blogsDB().collection('post');
 
-router.get('/postBlog', (req, res, next) => {
+
     res.render('postBlogs');
 })
 
-router.post('/submit', function (req, res, next) {
-    const newPost = {
+router.post('/submit', async function (req, res, next) {
+var collection2 = await blogsDB().collection('post');
+    collection2.insertOne({
         title: req.body.title,
         text: req.body.text,
         author: req.body.author,
         createdAt: new Date().toISOString(),
-        id: String(blogPosts.length + 1)
-    }
-    blogPosts.push(newPost)
-
-
+        id: await collection2.count() + 1
+    });
     res.send("got it");
 })
 

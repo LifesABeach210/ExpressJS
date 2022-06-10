@@ -3,31 +3,64 @@
   <head>
     <script src="//ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
     <script>
-        $(document).ready(function () {
-            var blogs = [];
-            $("#getBlogs").click(function () {
-                var sortOrder;
-                var url = "http://localhost:4000/blogs/all";
-                $("#blogList").empty();
-                sortOrder = $("#sorting option:selected").val();
-                if (sortOrder === "asc" || sortOrder === "desc"){
-                    url = url + "?sort=" + sortOrder
-                }
-                $.get(url, function (blogs) {
-                    blogs.forEach((blog) => {
-                    $("#blogList").append("<h3>" + blog.title + "</h3>");
-                    $("#blogList").append("<div> Author: " + blog.author + "</div>");
-                    $("#blogList").append("<br>");
-                    $("#blogList").append("<div>" + blog.text + "</div>");
-                    $("#blogList").append("<br>");
-                    });
-                });
-            });
+let allAuthors = document.querySelectorAll('.name');
+        // $(document).ready(function () {
+        //     var blogs = [];
+        //     $("#getBlogs").click(function () {
+        //         var sortOrder;
+        //         var url = "http://localhost:4000/blogs/authors";
+        //         $("#blogList").empty();
+        //         sortOrder = $("#sorting option:selected").val();
+        //         if (sortOrder === "asc" || sortOrder === "desc"){
+        //             url = url + "?sort=" + sortOrder
+        //         }
+        //         $.get(url, function (blogs) {
+        //             blogs.forEach((blog) => {
+        //             $("#blogList").append("<h3>" + blog.title + "</h3>");
+        //             $("#blogList").append("<div> Author: " + blog.author + "</div>");
+        //             $("#blogList").append("<br>");
+        //             $("#blogList").append("<div>" + blog.text + "</div>");
+        //             $("#blogList").append("<br>");
+        //             });
+//         });
 
-        });
+
+
+let myfunction = () => {
+console.log(allAuthors);
+
+for (var i = 0; i < allAuthors.length; i++) {
+allAuthors[i].addEventListener('click',function(){
+console.log(blogs2);
+}}};
+let blogs2 = [];
+
+
+let url2 = "http://localhost:4000/blogs/authors"
+
+
+$.get(url2, function (response) {
+for (var i = 0; i < response.author.length; i++) {
+$("#authorsNames").append("<li class = name onclick = myfunction()>"+response.author[i]+"</li>");
+
+}
+blogs2=response.post;
+
+    });
+
+
+
+    })
+    }
+
+
+
+
+
+
     </script>
   </head>
-  <body>
+  <body id = "body">
     <h1>Display Blogs</h1>
     <button id="getBlogs">Get Blogs</button>
 
@@ -38,6 +71,7 @@
         <option value="asc">Ascending</option>
         <option value="desc">Descending</option>
     </select>
-
+  <ul id = "authorsNames"></ul>
     <ul id="blogList"></ul>
+<p id = "blogsA"></p>
   </body>
